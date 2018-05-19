@@ -21,6 +21,9 @@ public class TTTController
 	Button buttonLeftUp, buttonUp, buttonRightUp, buttonLeft, buttonMiddle, buttonRight, buttonLeftDown, buttonDown, buttonRightDown;
 	
 	@FXML
+	Button buttonRestart;
+	
+	@FXML
 	Text turnText, figureText;
 	
 	@FXML private void initialize()
@@ -138,6 +141,19 @@ public class TTTController
 		}
 	}
 	
+	@FXML
+	void buttonRestart_Click()
+	{
+		clearBoard();
+		filledCells = 0;
+		consumer = new Consumer(selector + "", new QueueAsynchConsumer(this));
+		producer.sendQueueMessage("waiting" + selector + "");
+		turnText.setText("Waiting for Enemy");
+		figureText.setText("Your Figure: ");
+		buttonRestart.setVisible(false);
+	    figureText.setVisible(true);
+	}
+	
 	private int checkWin(int row, int column, String drawn)
 	{
 		//ROW
@@ -210,16 +226,31 @@ public class TTTController
 				break;
 			case 1:
 				turnText.setText("You Lost :C");
-				myTurn = false;
+				endGame();
 				break;
 			case 2:
 				turnText.setText("You Won :D");
-				myTurn = false;
+				endGame();
 				break;
 			case 3:
 				turnText.setText("Draw :|");
-				myTurn = false;
+				endGame();
 				break;
 		}
+	}
+	
+	public void clearBoard()
+	{
+		for(int i = 0 ; i < 3 ; ++i)
+			for(int j = 0 ; j < 3 ; ++j)
+				cells[i][j].setText("");
+	}
+	
+	public void endGame()
+	{
+		myTurn = false;
+		consumer.close();
+		buttonRestart.setVisible(true);
+		figureText.setVisible(false);
 	}
 }
